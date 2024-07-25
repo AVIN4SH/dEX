@@ -14,12 +14,17 @@ const tokens = (number) => {
 
 describe("Token", () => {
   let token; //making token a state variable so that it is accissible throughout the describe block, & we assign value inside below beforeEach hook
+  let accounts; //to store accounts that are in our blockchain(here the 20 hardhat accounts) we initialize it in beforeEach block
+  let deployer; //to store deployer of contract (i.e; here the 1st account of hardhat is deployer by default)
+
   beforeEach(async () => {
     //!this is code that gets executed before each of it blocks
     //(we can write the repeated code here, thus reducing redundancy and make code cleaner)
     const Token = await ethers.getContractFactory("Token"); //this is just getting the contract
     token = await Token.deploy("Barfi", "BRF", 1000000); //this is getting an instance of the deployed contract
     //above method calls constructor of contract, so we pass in values here
+    accounts = await ethers.getSigners(); //getting all the accounts that are in our blockchain (i.e; here the 20 accounts hardhat provides) (this returns an array)
+    deployer = accounts[0]; //this will store object form of deployer account with address as one of its attributes
   });
 
   describe("Deployment", () => {
@@ -55,6 +60,10 @@ describe("Token", () => {
 
       //above is old way: we can dynamically get token supply using our user defined function on top and using it below as:
       expect(await token.totalSupply()).to.equal(totalSupply);
+    });
+
+    it("assigns total supply of tokens to deployer", async () => {
+      expect(await token.balanceOf(deployer?.address)).to.equal(totalSupply);
     });
   });
 });

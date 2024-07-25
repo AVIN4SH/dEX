@@ -19,6 +19,11 @@ contract Token {
     //we want to store the wei equaivalent as we want our token to be 1 million in number, so instead of storing 1 million in value, we store 1 million with extra 18 zeroes
     //in conclusion, this value will be equal to: 1000000000000000000000000 (1 with 6+18 zeroes (6 of million & 18 of decimals))
 
+    //Tracking Balance (using mapping with address as key & balance as value)
+    mapping(address => uint256) public balanceOf; //we initialize in constructor
+
+    //Sending Tokens
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -27,6 +32,7 @@ contract Token {
         name = _name;
         symbol = _symbol;
         totalSupply = _totalSupply * (10 ** decimals); //to make in wei value we multiply
+        balanceOf[msg.sender] = totalSupply; //msg.sender is the deployer of contract & we provide it all the tokens
     }
     //we will pass in args in deploy() method as it calls constructor in test file of token
 }
