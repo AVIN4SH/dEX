@@ -50,21 +50,27 @@ contract Token {
 
     //we will pass in args in deploy() method as it calls constructor in test file of token
 
+    //this function is internal & not public and can only be used inside this contract & is created with aim to reduce code redundancy & duplicacy as we need this functionality in both transfer() & transferFrom() function
+    function _transfer(address _from, address _to, uint256 _value) internal {
+        require(_to != address(0)); //this checks if reciever is 0 address i.e; invalid and returns if invalid address
+
+        //deduct tokens from sender
+        balanceOf[_from] = balanceOf[_from] - _value;
+        // credit (add) to receiver
+        balanceOf[_to] = balanceOf[_to] + _value;
+
+        //Emit event
+        emit Transfer(_from, _to, _value);
+    }
+
     function transfer(
         address _to,
         uint256 _value
     ) public returns (bool success) {
         //require if sender has enough tokens to send
         require(balanceOf[msg.sender] >= _value); //*if this statement is true, rest of function lines gets executed & if false that function retunrs from here itself without executing further
-        require(_to != address(0)); //this checks if reciever is 0 address i.e; invalid and returns if invalid address
 
-        //deduct tokens from sender
-        balanceOf[msg.sender] = balanceOf[msg.sender] - _value;
-        // credit (add) to receiver
-        balanceOf[_to] = balanceOf[_to] + _value;
-
-        //Emit event
-        emit Transfer(msg.sender, _to, _value);
+        _transfer(msg.sender, _to, _value);
 
         return true;
     }
@@ -80,6 +86,23 @@ contract Token {
         //emit Approval event
         emit Approval(msg.sender, _spender, _value);
 
+        return true;
+    }
+
+    function transferFrom(
+        address _from,
+        address _to,
+        uint256 _value
+    ) public returns (bool success) {
+        //check approval (i.e; is the spender allowed to spend from owner wallet)
+        require(_value <= balanceOf[_from]); //checks if spender even has the amount of tokens he is trying to spend
+        require(_value <= allowance[_from][msg.sender]); //this checks if value that is about to be spent is less that or equal to the allowance provided to spender from owner which is a nested mapping that returns the amount of tokens provided as allowance (if true the function executes further and if false it means spender is trying to spend more than allowed and hence function returns & doesn't execute further) (if no value is set in mapping for this spender its set to 0 by default)
+
+        //reset/update allowance (this is to ensure there is no double spending)
+        allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value; //this updates allowance when someone spents and reduces by amount spent
+
+        //spend tokens
+        _transfer(_from, _to, _value);
         return true;
     }
 }

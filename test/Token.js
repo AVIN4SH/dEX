@@ -164,4 +164,62 @@ describe("Token", () => {
       });
     });
   });
+
+  describe("Delegated Token Transfers", () => {
+    //here we first need to check for approve & then use transferFrom as both are need for ERC 20 compatibale token
+
+    let amount, transaction, result;
+    //!Step 1: calling approve (here deployer approves the exchange)
+    beforeEach(async () => {
+      amount = tokens(100);
+      transaction = await token
+        .connect(deployer)
+        .approve(exchange.address, amount);
+      result = await transaction.wait();
+    });
+
+    //!Step 2: calling transferFrom (here exchange transfers tokens from deployer to reciever the approved amount to tokens)
+    describe("Success", () => {
+      beforeEach(async () => {
+        transaction = await token
+          .connect(exchange)
+          .transferFrom(deployer.address, receiver.address, amount);
+        result = await transaction.wait();
+      });
+
+      it("transfers token balances", async () => {
+        expect(await token.balanceOf(deployer.address)).to.be.equal(
+          ethers.utils.parseUnits("999900", "ether")
+        );
+        expect(await token.balanceOf(receiver.address)).to.be.equal(amount);
+      });
+
+      it("resets the allowance", async () => {
+        expect(
+          await token.allowance(deployer.address, exchange.address)
+        ).to.be.equal(0);
+      });
+
+      it("emits a Transfer event", async () => {
+        const event = result.events[0];
+        // console.log(event);
+        expect(event.event).to.equal("Transfer");
+
+        const args = event.args;
+        expect(args.from).to.equal(deployer.address);
+        expect(args.to).to.equal(receiver.address);
+        expect(args.value).to.equal(amount);
+      });
+    });
+
+    describe("Failure", async () => {
+      //attempt to transfer too many tokens
+      const invalidAmount = tokens(100000000); //we use 100 million as its larger than total supply & hencforth invalid
+      await expect(
+        token
+          .connect(exchange)
+          .transferFrom(deployer.address, receiver.address, invalidAmount)
+      ).to.be.reverted;
+    });
+  });
 });
