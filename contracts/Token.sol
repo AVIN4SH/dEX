@@ -22,8 +22,20 @@ contract Token {
     //Tracking Balance (using mapping with address as key & balance as value)
     mapping(address => uint256) public balanceOf; //we initialize in constructor
 
+    //this will be a nested mapping that will be used in transfer approval
+    mapping(address => mapping(address => uint256)) public allowance;
+    //here 1st key is sender address, 2nd key is address of receiver that returns number of tokens approved for transfer
+    //1st is of owner & 2nd address is of individual spender that is allowed to spend a number of tokens that are approved and it returns that number
+
     //transfer event (that we will emit when transfer function is executed)
     event Transfer(address indexed from, address indexed to, uint256 value);
+
+    //Approval event that will be emitted/triggered on every succesful call to approve
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 
     constructor(
         string memory _name,
@@ -53,6 +65,20 @@ contract Token {
 
         //Emit event
         emit Transfer(msg.sender, _to, _value);
+
+        return true;
+    }
+
+    function approve(
+        address _spender,
+        uint256 _value
+    ) public returns (bool success) {
+        allowance[msg.sender][_spender] = _value; //this is how value is assigned to nested mapping (1st value goes to 1st key and 2nd to 2nd key that points to a value i.e; number of tokens approved)
+
+        require(_spender != address(0));
+
+        //emit Approval event
+        emit Approval(msg.sender, _spender, _value);
 
         return true;
     }

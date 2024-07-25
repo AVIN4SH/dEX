@@ -17,6 +17,7 @@ describe("Token", () => {
   let accounts; //to store accounts that are in our blockchain(here the 20 hardhat accounts) we initialize it in beforeEach block
   let deployer; //to store deployer of contract (i.e; here the 1st account of hardhat is deployer by default)
   let receiver; //to store an account that will receive the transefered tokens
+  let exchange; //variable which be account that will be used to simulate exchange of tokens
 
   beforeEach(async () => {
     //!this is code that gets executed before each of it blocks
@@ -27,6 +28,7 @@ describe("Token", () => {
     accounts = await ethers.getSigners(); //getting all the accounts that are in our blockchain (i.e; here the 20 accounts hardhat provides) (this returns an array)
     deployer = accounts[0]; //this will store object form of deployer account with address as one of its attributes
     receiver = accounts[1]; //this account will recieve tokens that are transfered
+    exchange = accounts[2];
   });
 
   describe("Deployment", () => {
@@ -120,6 +122,45 @@ describe("Token", () => {
             .connect(deployer)
             .transfer("0x0000000000000000000000000000000000000000", amount)
         ).to.be.reverted; //using waffle we throgh error message and revert the transaction due to invalid receiver address
+      });
+    });
+  });
+
+  describe("Approving Tokens", () => {
+    let amount, transaction, result;
+    beforeEach(async () => {
+      amount = tokens(100);
+      transaction = await token
+        .connect(deployer)
+        .approve(exchange.address, amount);
+      result = await transaction.wait();
+    });
+
+    describe("Success", () => {
+      it("allocates an allowance for delegated token spending", async () => {
+        expect(
+          await token.allowance(deployer.address, exchange.address)
+        ).to.equal(amount);
+      });
+      it("emits a Approval event", async () => {
+        const event = result.events[0];
+        // console.log(event);
+        expect(event.event).to.equal("Approval");
+        const args = event.args;
+        expect(args.owner).to.equal(deployer.address);
+        expect(args.spender).to.equal(exchange.address);
+        expect(args.value).to.equal(amount);
+      });
+    });
+
+    describe("Failure", () => {
+      it("rejects due to invalid spender", async () => {
+        const amount = tokens(100);
+        await expect(
+          token
+            .connect(deployer)
+            .approve("0x0000000000000000000000000000000000000000", amount)
+        ).to.be.reverted;
       });
     });
   });
