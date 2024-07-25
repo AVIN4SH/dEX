@@ -22,7 +22,8 @@ contract Token {
     //Tracking Balance (using mapping with address as key & balance as value)
     mapping(address => uint256) public balanceOf; //we initialize in constructor
 
-    //Sending Tokens
+    //transfer event (that we will emit when transfer function is executed)
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     constructor(
         string memory _name,
@@ -34,5 +35,25 @@ contract Token {
         totalSupply = _totalSupply * (10 ** decimals); //to make in wei value we multiply
         balanceOf[msg.sender] = totalSupply; //msg.sender is the deployer of contract & we provide it all the tokens
     }
+
     //we will pass in args in deploy() method as it calls constructor in test file of token
+
+    function transfer(
+        address _to,
+        uint256 _value
+    ) public returns (bool success) {
+        //require if sender has enough tokens to send
+        require(balanceOf[msg.sender] >= _value); //*if this statement is true, rest of function lines gets executed & if false that function retunrs from here itself without executing further
+        require(_to != address(0)); //this checks if reciever is 0 address i.e; invalid and returns if invalid address
+
+        //deduct tokens from sender
+        balanceOf[msg.sender] = balanceOf[msg.sender] - _value;
+        // credit (add) to receiver
+        balanceOf[_to] = balanceOf[_to] + _value;
+
+        //Emit event
+        emit Transfer(msg.sender, _to, _value);
+
+        return true;
+    }
 }
