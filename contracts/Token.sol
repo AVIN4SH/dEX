@@ -95,8 +95,11 @@ contract Token {
         uint256 _value
     ) public returns (bool success) {
         //check approval (i.e; is the spender allowed to spend from owner wallet)
-        require(_value <= balanceOf[_from]); //checks if spender even has the amount of tokens he is trying to spend
-        require(_value <= allowance[_from][msg.sender]); //this checks if value that is about to be spent is less that or equal to the allowance provided to spender from owner which is a nested mapping that returns the amount of tokens provided as allowance (if true the function executes further and if false it means spender is trying to spend more than allowed and hence function returns & doesn't execute further) (if no value is set in mapping for this spender its set to 0 by default)
+        require(_value <= balanceOf[_from], "insufficient balance"); //checks if spender even has the amount of tokens he is trying to spend
+        require(
+            _value <= allowance[_from][msg.sender],
+            "insufficient allowance"
+        ); //this checks if value that is about to be spent is less that or equal to the allowance provided to spender from owner which is a nested mapping that returns the amount of tokens provided as allowance (if true the function executes further and if false it means spender is trying to spend more than allowed and hence function returns & doesn't execute further) (if no value is set in mapping for this spender its set to 0 by default)
 
         //reset/update allowance (this is to ensure there is no double spending)
         allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value; //this updates allowance when someone spents and reduces by amount spent
