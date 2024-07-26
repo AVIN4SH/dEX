@@ -24,6 +24,13 @@ contract Exchange {
 
     event Deposit(address token, address user, uint256 amount, uint256 balance);
 
+    event Withdraw(
+        address token,
+        address user,
+        uint256 amount,
+        uint256 balance
+    );
+
     constructor(address _feeAccount, uint256 _feePercent) {
         //we will pass this value dynamically while deploying from test file
         feeAccount = _feeAccount;
@@ -32,13 +39,29 @@ contract Exchange {
 
     //Deposit Token
     function depositToken(address _token, uint256 _amount) public {
-        //transfer tokens to exchange (for this we use a method from Token contract by instantiating it using concerned token address)
+        //*transfer tokens to exchange (for this we use a method from Token contract by instantiating it using concerned token address)
         require(Token(_token).transferFrom(msg.sender, address(this), _amount)); //here inside require is used for referring to this account from original  function definition (i.e; it is referencing address of this smart contract from another smart contract)
-        //update user balance & we made it inside require for extra protection so that if this is not true(cannot run) then function returns from here without executing further which give us extra layer of security
+
+        //*update user balance & we made it inside require for extra protection so that if this is not true(cannot run) then function returns from here without executing further which give us extra layer of security
         tokens[_token][msg.sender] = tokens[_token][msg.sender] + _amount; //adding amount deposited to user of concerned token
         //if nothing is deposited first, default value is 0 so amount dposited will be added to 0 at first
-        //emit event
+
+        //*emit event
         emit Deposit(_token, msg.sender, _amount, tokens[_token][msg.sender]);
+    }
+
+    function withdrawToken(address _token, uint256 _amount) public {
+        //*ensure user has enough tokens to withdraw
+        require(tokens[_token][msg.sender] >= _amount);
+
+        //*transfer tokens to user
+        Token(_token).transfer(msg.sender, _amount);
+
+        //*update user balace
+        tokens[_token][msg.sender] = tokens[_token][msg.sender] - _amount; //now withdrawing so we subtract
+
+        //*emit event
+        emit Withdraw(_token, msg.sender, _amount, tokens[_token][msg.sender]);
     }
 
     //Check Balance
