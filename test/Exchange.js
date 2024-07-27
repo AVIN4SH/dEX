@@ -6,7 +6,7 @@ const tokens = (number) => {
 };
 
 describe("Exchange", () => {
-  let deployer, feeAccount, exchange, token1, user1;
+  let deployer, feeAccount, exchange, token1, user1, token2;
   const feePercent = 10; //percent of fees that will be charged and is initialized as constant as it will be fixed
 
   beforeEach(async () => {
@@ -15,6 +15,7 @@ describe("Exchange", () => {
 
     //deploying token twice to perform exchange between the 2
     token1 = await Token.deploy("Barfi", "BRF", 1000000);
+    token2 = await Token.deploy("Mock Dai", "mDai", 1000000);
 
     accounts = await ethers.getSigners();
     deployer = accounts[0];
@@ -38,6 +39,8 @@ describe("Exchange", () => {
       expect(await exchange.feePercent()).to.equal(10);
     });
   });
+
+  //! failure block in test case works fine and reverts transaction as we are not emitting any event in failure block whereas we are in success blocks, beforeEach part, so as the failure block does not emit any event it fails and since we used revert transaction, the test case passes.
 
   describe("Depositing Tokens", () => {
     let transaction, result;
@@ -166,6 +169,61 @@ describe("Exchange", () => {
       expect(await exchange.balanceOf(token1.address, user1.address)).to.equal(
         amount
       );
+    });
+  });
+
+  describe("Making Orders", async () => {
+    let transaction, result;
+    let amount = tokens(1); //amount of tokens we deposit, approve & make orders for
+
+    describe("Success", () => {
+      beforeEach(async () => {
+        //before making each order, first we make user deposit & approve tokens
+        //Approve token
+        transaction = await token1
+          .connect(user1)
+          .approve(exchange.address, amount);
+        result = await transaction.wait();
+        //Deposit token
+        transaction = await exchange
+          .connect(user1)
+          .depositToken(token1.address, amount);
+        result = await transaction.wait();
+
+        //making order:
+        transaction = await exchange
+          .connect(user1)
+          .makeOrder(token2.address, amount, token1.address, amount); //here we make order for getting 1 mDai by giving 1 BRF
+        result = await transaction.wait();
+      });
+
+      it("tracks the newly created order", async () => {
+        expect(await exchange.orderCount()).to.equal(1);
+      });
+
+      it("emits a Order event", async () => {
+        const event = result.events[0]; //we emitted 3 events and making order was 3rd so we specify 3rd index here
+        expect(event.event).to.equal("Order");
+
+        const args = event.args;
+        expect(args.id).to.equal(1);
+        expect(args.user).to.equal(user1.address);
+        expect(args.tokenGet).to.equal(token2.address);
+        expect(args.amountGet).to.equal(tokens(1));
+        expect(args.tokenGive).to.equal(token1.address);
+        expect(args.amountGive).to.equal(tokens(1));
+        expect(args.timestamp).to.at.least(1); //we do normal check that timestamp exists as its very complex to check time of order make on blockchain
+      });
+    });
+
+    describe("Failure", () => {
+      it("rejects with no balance", async () => {
+        await expect(
+          exchange
+            .connect(user1)
+            .makeOrder(token2.address, tokens(1), token1.address, tokens(1))
+        ).to.be.reverted;
+      });
     });
   });
 });

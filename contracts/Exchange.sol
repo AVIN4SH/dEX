@@ -22,6 +22,9 @@ contract Exchange {
 
     mapping(address => mapping(address => uint256)) public tokens; //here 1st key is for token, 2nd for user and 3rd for amount
 
+    //mapping for order with id as key & it points to struct _Order
+    mapping(uint256 => _Order) public orders; //1st key is id that is of order & value it points to is our struct _Order
+
     event Deposit(address token, address user, uint256 amount, uint256 balance);
 
     event Withdraw(
@@ -30,6 +33,29 @@ contract Exchange {
         uint256 amount,
         uint256 balance
     );
+
+    event Order(
+        uint256 id,
+        address user,
+        address tokenGet,
+        uint256 amountGet,
+        address tokenGive,
+        uint256 amountGive,
+        uint256 timestamp
+    );
+
+    uint256 public orderCount; //this will bw used as id for each order made & updated with increase in order (when no orders are made then initial value is 0)
+    //struct for order to organize data associated: (we will use this order in order mapping above)
+    struct _Order {
+        //attributes of order:
+        uint256 id; //unique identity for order, to track orders
+        address user; //address of user who made order
+        address tokenGet; //address of token they receive
+        uint256 amountGet; //amount of token they receive
+        address tokenGive; //address of token they give
+        uint256 amountGive; //amount of token they give
+        uint256 timestamp; //when order was made (this will be in epoch time that is number of seconds that have passed from 1st January 1970)
+    }
 
     constructor(address _feeAccount, uint256 _feePercent) {
         //we will pass this value dynamically while deploying from test file
@@ -50,6 +76,7 @@ contract Exchange {
         emit Deposit(_token, msg.sender, _amount, tokens[_token][msg.sender]);
     }
 
+    //withdraw tokens
     function withdrawToken(address _token, uint256 _amount) public {
         //*ensure user has enough tokens to withdraw
         require(tokens[_token][msg.sender] >= _amount);
@@ -70,5 +97,42 @@ contract Exchange {
         address _user
     ) public view returns (uint256) {
         return tokens[_token][_user]; //by this we are reading number of tokens user has in our nested mapping
+    }
+
+    //making orders:
+    function makeOrder(
+        address _tokenGet,
+        uint256 _amountGet,
+        address _tokenGive,
+        uint256 _amountGive
+    ) public {
+        //-Token Give (the token the want to spend) - which token & how much
+        //-Token Get (the token the want to receive) - which token & how much
+
+        //require token balance before making orders
+        require(balanceOf(_tokenGive, msg.sender) >= _amountGive);
+
+        // instantiate new order
+        orderCount = orderCount + 1; //this is for increasing count of order with each order made that will be used as id for order
+        orders[orderCount] = _Order(
+            orderCount, //id of order
+            msg.sender, //user who made order
+            _tokenGet, //token that will be recieved
+            _amountGet, //amount that will be recieved
+            _tokenGive, //token that will be given
+            _amountGive, //amount that will be given
+            block.timestamp //timestamp when order was made (this will be in epoch time that is number of seconds that have passed from 1st January 1970)
+        );
+
+        //emit a order event
+        emit Order(
+            orderCount,
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            block.timestamp
+        );
     }
 }
