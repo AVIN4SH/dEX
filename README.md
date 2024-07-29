@@ -1,8 +1,39 @@
-# React + Vite
+# To run scripts of deployment follow these steps:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+First Command:
 
-Currently, two official plugins are available:
+```
+npx hardhat node
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Second Command:
+
+```
+npx hardhat run --network localhost scripts/1_deploy.js
+```
+
+Third Command:
+
+```
+npx hardhat run --network localhost scripts/2_seed-exchange.js
+```
+
+# To run tests follow these steps:
+
+To run all tests together:
+
+```
+npx hardhat test
+```
+
+To run Test for Token only:
+
+```
+npx hardhat test test/Token.js
+```
+
+To run Test for Exchange:
+
+```
+npx hardhat test test/Exchange.js
+```
