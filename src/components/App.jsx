@@ -1,36 +1,29 @@
 import { useEffect } from "react";
-import { ethers } from "ethers";
-import addressConfig from "../../utils/addressConfig.json";
-import TOKEN_ABI from "../abis/Token.json";
-import "../App.css";
+import { useDispatch } from "react-redux";
+import {
+  loadProvider,
+  loadNetwork,
+  loadAccount,
+  loadToken,
+} from "../store/interactions";
+import config from "../../utils/addressConfig.json";
 
 /* 
 Here in client side application we will use vanilla ethers i.e; normal ethers library as it is different from the one we imported as ethers from hardhat in deploy and test scripts as that one is from hardhat which we don't require here
 */
 
 function App() {
-  const loadBlockChainData = async () => {
-    // * - connect to metamask wallet and get account:
-    const accounts = await window.ethereum.request({
-      //this makes RPC call to our node to get our account we are connect with
-      method: "eth_requestAccounts",
-    });
-    console.log(accounts[0]);
+  const dispatch = useDispatch();
 
-    // * - interact with Token smart contract
-    // Connecting ethers to Blockchain
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const { chainId } = await provider.getNetwork();
-    console.log(chainId);
-    // Token Smart Contract
-    const token = new ethers.Contract(
-      addressConfig[chainId].BRF.address,
-      TOKEN_ABI,
-      provider
-    );
-    //Now we can interact with Token contract and call in all avaiable functions
-    console.log(token.address);
-    console.log(await token.symbol());
+  const loadBlockChainData = async () => {
+    try {
+      await loadAccount(dispatch);
+      const provider = await loadProvider(dispatch);
+      const chainId = await loadNetwork(provider, dispatch);
+      await loadToken(provider, config[chainId].BRF.address, dispatch);
+    } catch (error) {
+      console.error("Error initializing:", error);
+    }
   };
 
   useEffect(() => {
