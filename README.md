@@ -1,3 +1,10 @@
+<!--
+ removed kovvan option from select network tab as project id need to be taken by creating account on kovan.infura
+            {/* <option value="0x2a">Kovan</option> */}
+            {/* Test network link not connecting and error 4902 occuring when this is selected */}
+
+-->
+
 # To start the project follow these commands:
 
 First Command:

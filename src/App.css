@@ -56,6 +56,32 @@ small {
   color: var(--clr-neutral);
 }
 
+/* Styling for the select element */
+select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #111325;
+  font-size: 1rem;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+}
+/* Styling for the options */
+select > option {
+  padding: 0.5rem;
+  background-color: #090520;
+  color: #cecece;
+  cursor: pointer;
+}
+select > option:checked {
+  background-color: #001730;
+  color: #fff;
+}
+select:hover {
+  border-color: #000f20;
+}
+
 /* ------------------------------------------------------ */
 /* -- Display -- */
 
