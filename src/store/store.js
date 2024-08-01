@@ -1,29 +1,36 @@
 import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
-import providerReducer from "./provirderSlice";
-import tokenReducer from "./tokenSlice";
+import providerReducer from "./providerSlice";
+import tokensReducer from "./tokensSlice";
+import exchangeReducer from "./exchangeSlice";
 
 const store = configureStore({
   reducer: {
     provider: providerReducer,
-    token: tokenReducer,
+    tokens: tokensReducer,
+    exchange: exchangeReducer,
   },
   middleware: (getDefaultMiddleware) =>
+    /*
+      To remove warning that appears because Redux Toolkit includes checks to ensure that all actions and state are serializable by default. Web3Provider objects from ethers.js are not serializable, and that's why this warning occurs.
+      */
     getDefaultMiddleware({
-      /*
-        To remove warning that appears because Redux Toolkit includes checks to ensure that all actions and state are serializable by default. Web3Provider objects from ethers.js are not serializable, and that's why this warning occurs.
-        */
       serializableCheck: {
         ignoredActions: [
           "provider/providerLoaded",
           "provider/networkLoaded",
           "provider/accountLoaded",
-          "token/tokenLoaded",
+          "provider/etherBalanceLoaded",
+          "tokens/token1Loaded",
+          "tokens/token2Loaded",
+          "exchange/exchangeLoaded",
         ],
         ignoredPaths: [
           "provider.connection",
           "provider.account",
-          "token.contract",
+          "provider.balance",
+          "tokens.contracts",
+          "exchange.contract",
         ],
       },
     }).concat(thunk),

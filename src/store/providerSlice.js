@@ -13,10 +13,17 @@ const providerSlice = createSlice({
     accountLoaded: (state, action) => {
       state.account = action.payload.account;
     },
+    etherBalanceLoaded: (state, action) => {
+      state.balance = action.payload.balance;
+    },
   },
 });
 
-export const { providerLoaded, networkLoaded, accountLoaded } =
-  providerSlice.actions;
+export const {
+  providerLoaded,
+  networkLoaded,
+  accountLoaded,
+  etherBalanceLoaded,
+} = providerSlice.actions;
 
 export default providerSlice.reducer;

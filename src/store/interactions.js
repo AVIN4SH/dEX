@@ -1,7 +1,14 @@
 import { ethers } from "ethers";
-import { providerLoaded, networkLoaded, accountLoaded } from "./provirderSlice";
-import { tokenLoaded } from "./tokenSlice";
+import {
+  providerLoaded,
+  networkLoaded,
+  accountLoaded,
+  etherBalanceLoaded,
+} from "./providerSlice";
+import { token1Loaded, token2Loaded } from "./tokensSlice";
+import { exchangeLoaded } from "./exchangeSlice";
 import TOKEN_ABI from "../abis/Token.json";
+import EXCHANGE_ABI from "../abis/Token.json";
 
 export const loadProvider = async (dispatch) => {
   try {
@@ -23,26 +30,51 @@ export const loadNetwork = async (provider, dispatch) => {
   }
 };
 
-export const loadAccount = async (dispatch) => {
+export const loadAccount = async (provider, dispatch) => {
   try {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
     const account = ethers.utils.getAddress(accounts[0]);
     dispatch(accountLoaded({ account }));
+
+    let balance = await provider.getBalance(account);
+    balance = ethers.utils.formatEther(balance);
+    dispatch(etherBalanceLoaded({ balance }));
+
     return account;
   } catch (error) {
     console.error("Failed to load account:", error);
   }
 };
 
-export const loadToken = async (provider, address, dispatch) => {
+export const loadTokens = async (provider, addresses, dispatch) => {
   try {
-    const token = new ethers.Contract(address, TOKEN_ABI, provider);
-    const symbol = await token.symbol();
-    dispatch(tokenLoaded({ token, symbol }));
+    let token, symbol;
+
+    token = new ethers.Contract(addresses[0], TOKEN_ABI, provider);
+    symbol = await token.symbol();
+    dispatch(token1Loaded({ token, symbol }));
+
+    token = new ethers.Contract(addresses[1], TOKEN_ABI, provider);
+    symbol = await token.symbol();
+    dispatch(token2Loaded({ token, symbol }));
+
     return token;
   } catch (error) {
     console.error("Failed to load token:", error);
+  }
+};
+
+export const loadExchange = async (provider, address, dispatch) => {
+  try {
+    let exchange;
+
+    exchange = new ethers.Contract(address, EXCHANGE_ABI, provider);
+    dispatch(exchangeLoaded({ exchange }));
+
+    return exchange;
+  } catch (error) {
+    console.error("Failed to load exchange:", error);
   }
 };

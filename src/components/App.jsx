@@ -4,23 +4,29 @@ import {
   loadProvider,
   loadNetwork,
   loadAccount,
-  loadToken,
+  loadTokens,
+  loadExchange,
 } from "../store/interactions";
 import config from "../../utils/addressConfig.json";
-
-/* 
-Here in client side application we will use vanilla ethers i.e; normal ethers library as it is different from the one we imported as ethers from hardhat in deploy and test scripts as that one is from hardhat which we don't require here
-*/
 
 function App() {
   const dispatch = useDispatch();
 
   const loadBlockChainData = async () => {
     try {
-      await loadAccount(dispatch);
+      // connecting ethers to blockchain
       const provider = await loadProvider(dispatch);
+      // fetching current network's chainId (example:  hardhat: 31337)
       const chainId = await loadNetwork(provider, dispatch);
-      await loadToken(provider, config[chainId].BRF.address, dispatch);
+      // fetching current account & balance from metamask
+      await loadAccount(provider, dispatch);
+      // loading token smart contract (here we load tokens in pair so we can provide market slection option on dEX)
+      const BRF = config[chainId].BRF;
+      const mETH = config[chainId].mETH;
+      await loadTokens(provider, [BRF.address, mETH.address], dispatch);
+      // loading exchange smart contract
+      const exchangeConfig = config[chainId].exchange;
+      await loadExchange(provider, exchangeConfig.address, dispatch);
     } catch (error) {
       console.error("Error initializing:", error);
     }
