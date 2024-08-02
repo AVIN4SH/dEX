@@ -73,9 +73,13 @@ const Navbar = () => {
         {account ? (
           <a
             href={
+              config[chainId] && "/#"
+              /* 
+              * use below code when deploying to a testnet (as currently hardhat so default will be "#")
               config[chainId]
                 ? `${config[chainId].explorerURL}/address/${account}`
                 : "#"
+              */
             }
           >
             {account.slice(0, 5) + "..." + account.slice(38, 42)}

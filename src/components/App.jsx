@@ -9,6 +9,7 @@ import {
 } from "../store/interactions";
 import config from "../../utils/addressConfig.json";
 import Navbar from "./Navbar";
+import Markets from "./Markets";
 
 function App() {
   const dispatch = useDispatch();
@@ -28,7 +29,8 @@ function App() {
       window.ethereum.on("accountsChanged", () => {
         loadAccount(provider, dispatch);
       });
-      // loading token smart contract (here we load tokens in pair so we can provide market slection option on dEX)
+      // loading token smart contract (here we load tokens in pair so we can provide market slection option on dEX
+      // here we load this just for loading sake, main tokens will be loaded when user select market in Markets component
       const BRF = config[chainId].BRF;
       const mETH = config[chainId].mETH;
       await loadTokens(provider, [BRF.address, mETH.address], dispatch);
@@ -49,7 +51,7 @@ function App() {
       <Navbar />
       <main className="exchange grid">
         <section className="exchange__section--left grid">
-          {/* Markets */}
+          <Markets />
           {/* Balance */}
           {/* Order */}
         </section>
