@@ -5,10 +5,22 @@ import {
   accountLoaded,
   etherBalanceLoaded,
 } from "./providerSlice";
-import { token1Loaded, token2Loaded } from "./tokensSlice";
-import { exchangeLoaded } from "./exchangeSlice";
+import {
+  token1Loaded,
+  token2Loaded,
+  token1BalanceLoaded,
+  token2BalanceLoaded,
+} from "./tokensSlice";
+import {
+  exchangeLoaded,
+  exchnageToken1BalanceLoaded,
+  exchnageToken2BalanceLoaded,
+  transferRequest,
+  transferSuccess,
+  transferFail,
+} from "./exchangeSlice";
 import TOKEN_ABI from "../abis/Token.json";
-import EXCHANGE_ABI from "../abis/Token.json";
+import EXCHANGE_ABI from "../abis/Exchange.json";
 
 export const loadProvider = async (dispatch) => {
   try {
@@ -76,5 +88,66 @@ export const loadExchange = async (provider, address, dispatch) => {
     return exchange;
   } catch (error) {
     console.error("Failed to load exchange:", error);
+  }
+};
+
+export const subscribeToEvents = async (exchange, dispatch) => {
+  exchange.on("Deposit", (token, user, amount, balance, event) => {
+    // Notify app that transfer was successful
+    dispatch(transferSuccess({ event }));
+  });
+};
+
+// Load User Balances (Wallet & Exchange Balances)
+export const loadBalances = async (exchange, tokens, account, dispatch) => {
+  try {
+    let balance;
+    // token 1 balance with user
+    balance = ethers.utils.formatUnits(await tokens[0].balanceOf(account), 18);
+    dispatch(token1BalanceLoaded({ balance }));
+    // token 1 balance on exchange
+    balance = ethers.utils.formatUnits(
+      await exchange.balanceOf(tokens[0].address, account),
+      18
+    );
+    dispatch(exchnageToken1BalanceLoaded({ balance }));
+    // token 2 balance with user
+    balance = ethers.utils.formatUnits(await tokens[1].balanceOf(account), 18);
+    dispatch(token2BalanceLoaded({ balance }));
+    // token 2 balance on exchange
+    balance = ethers.utils.formatUnits(
+      await exchange.balanceOf(tokens[1].address, account),
+      18
+    );
+    dispatch(exchnageToken2BalanceLoaded({ balance }));
+  } catch (error) {
+    console.error("Failed to load Balances:", error);
+  }
+};
+
+// Transfer Tokens (Deposit & Withdraw)
+export const transferTokens = async (
+  provider,
+  exchange,
+  transferType,
+  token,
+  amount,
+  dispatch
+) => {
+  try {
+    let transaction;
+    dispatch(transferRequest());
+    const signer = await provider.getSigner();
+    const amountToTransfer = ethers.utils.parseUnits(amount.toString(), 18);
+    transaction = await token
+      .connect(signer)
+      .approve(exchange.address, amountToTransfer);
+    await transaction.wait();
+    transaction = await exchange
+      .connect(signer)
+      .depositToken(token.address, amountToTransfer);
+    await transaction.wait();
+  } catch (error) {
+    dispatch(transferFail());
   }
 };

@@ -24,6 +24,8 @@ const store = configureStore({
           "tokens/token1Loaded",
           "tokens/token2Loaded",
           "exchange/exchangeLoaded",
+          "exchange/transferSuccess",
+          "exchange/transferFail",
         ],
         ignoredPaths: [
           "provider.connection",
@@ -31,6 +33,7 @@ const store = configureStore({
           "provider.balance",
           "tokens.contracts",
           "exchange.contract",
+          "exchange.events",
         ],
       },
     }).concat(thunk),

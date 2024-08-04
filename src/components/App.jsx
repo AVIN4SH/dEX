@@ -1,18 +1,21 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   loadProvider,
   loadNetwork,
   loadTokens,
   loadExchange,
   loadAccount,
+  subscribeToEvents,
 } from "../store/interactions";
 import config from "../../utils/addressConfig.json";
 import Navbar from "./Navbar";
 import Markets from "./Markets";
+import Balance from "./Balance";
 
 function App() {
   const dispatch = useDispatch();
+
 
   const loadBlockChainData = async () => {
     try {
@@ -36,7 +39,9 @@ function App() {
       await loadTokens(provider, [BRF.address, mETH.address], dispatch);
       // loading exchange smart contract
       const exchangeConfig = config[chainId].exchange;
-      await loadExchange(provider, exchangeConfig.address, dispatch);
+      const exchange = await loadExchange(provider, exchangeConfig.address, dispatch);
+      // Listen to events
+      await subscribeToEvents(exchange, dispatch);
     } catch (error) {
       console.error("Error initializing:", error);
     }
@@ -44,7 +49,7 @@ function App() {
 
   useEffect(() => {
     loadBlockChainData();
-  });
+  }, []);
 
   return (
     <div>
@@ -52,7 +57,7 @@ function App() {
       <main className="exchange grid">
         <section className="exchange__section--left grid">
           <Markets />
-          {/* Balance */}
+          <Balance />
           {/* Order */}
         </section>
         <section className="exchange__section--right grid">
