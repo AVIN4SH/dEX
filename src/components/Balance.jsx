@@ -1,11 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import logo from "../assets/dapp.svg";
-import { useEffect, useState } from "react";
+import ethLogo from "../assets/eth.svg";
+import { useEffect, useRef, useState } from "react";
 import { loadBalances, transferTokens } from "../store/interactions";
 
 const Balance = () => {
   const [token1TransferAmount, setToken1TransferAmount] = useState(0);
   const [token2TransferAmount, setToken2TransferAmount] = useState(0);
+
+  const [isDeposit, setIsDeposit] = useState(true);
 
   const dispatch = useDispatch();
 
@@ -32,10 +35,11 @@ const Balance = () => {
   const amountHandler = (e, token) => {
     if (token.address === tokens[0].address) {
       setToken1TransferAmount(e.target.value);
-    } else if (token.address === tokens[1].address) {
+    } else {
       setToken2TransferAmount(e.target.value);
     }
-    // console.log({ token1TransferAmount });
+    // console.log("Token 1 Deposit Amount: " + token1TransferAmount);
+    // console.log("Token 2 Deposit Amount: " + token2TransferAmount);
   };
 
   /*
@@ -58,8 +62,16 @@ const Balance = () => {
         dispatch
       );
       setToken1TransferAmount(0);
-    } else if (token.address === tokens[1].address) {
-      console.log(e);
+    } else {
+      transferTokens(
+        provider,
+        exchange,
+        "Deposit",
+        token,
+        token2TransferAmount,
+        dispatch
+      );
+      setToken2TransferAmount(0);
     }
   };
 
@@ -69,13 +81,36 @@ const Balance = () => {
     }
   }, [transferInProgress]);
 
+  const depositRef = useRef(null);
+  const withdrawtRef = useRef(null);
+
+  const tabHandler = (e) => {
+    if (e.target.className !== depositRef.current.className) {
+      e.target.className = "tab tab--active";
+      depositRef.current.className = "tab";
+      setIsDeposit(false);
+    } else {
+      e.target.className = "tab tab--active";
+      withdrawtRef.current.className = "tab";
+      setIsDeposit(true);
+    }
+  };
+
   return (
     <div className="component exchange__transfers">
       <div className="component__header flex-between">
         <h2>Balance</h2>
         <div className="tabs">
-          <button className="tab tab--active">Deposit</button>
-          <button className="tab">Withdraw</button>
+          <button
+            onClick={tabHandler}
+            ref={depositRef}
+            className="tab tab--active"
+          >
+            Deposit
+          </button>
+          <button onClick={tabHandler} ref={withdrawtRef} className="tab">
+            Withdraw
+          </button>
         </div>
       </div>
 
@@ -109,7 +144,7 @@ const Balance = () => {
           />
 
           <button className="button" type="submit">
-            <span>Deposit</span>
+            <span>{isDeposit ? "Deposit" : "Withdraw"}</span>
           </button>
         </form>
       </div>
@@ -123,7 +158,7 @@ const Balance = () => {
           <p>
             <small>Token</small>
             <br />
-            <img src={logo} alt="Token Logo" /> {symbols && symbols[1]}
+            <img src={ethLogo} alt="Token Logo" /> {symbols && symbols[1]}
           </p>
           <p>
             <small>Wallet</small>
@@ -135,17 +170,18 @@ const Balance = () => {
           </p>
         </div>
 
-        <form>
+        <form onSubmit={(e) => depositHandler(e, tokens[1])}>
           <label htmlFor="token1">{symbols && symbols[1]} Amount</label>
           <input
             type="number"
-            id="token1"
+            id="token2"
             placeholder="0.0000"
-            onChange={(e) => amountHandler(e, tokens[0])}
+            value={token2TransferAmount === 0 ? "" : token2TransferAmount}
+            onChange={(e) => amountHandler(e, tokens[1])}
           />
 
           <button className="button" type="submit">
-            <span></span>
+            <span>{isDeposit ? "Deposit" : "Withdraw"}</span>
           </button>
         </form>
       </div>
