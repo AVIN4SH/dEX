@@ -14,6 +14,10 @@ const exchangeSlice = createSlice({
     },
     transferInProgress: false,
     events: [],
+    allOrders: {
+      loaded: false,
+      data: [],
+    },
   },
   reducers: {
     exchangeLoaded: (state, action) => {
@@ -27,6 +31,7 @@ const exchangeSlice = createSlice({
       state.balances[1] = action.payload.balance;
     },
     // tracking transfer cases (deposit & withdraw)
+    // eslint-disable-next-line no-unused-vars
     transferRequest: (state, action) => {
       state.transaction = {
         ...state.transaction,
@@ -47,6 +52,7 @@ const exchangeSlice = createSlice({
       state.transferInProgress = false;
       state.events = [action.payload.event, ...state.events];
     },
+    // eslint-disable-next-line no-unused-vars
     transferFail: (state, action) => {
       state.transaction = {
         transactionType: "Transfer",
@@ -55,6 +61,47 @@ const exchangeSlice = createSlice({
         isError: true,
       };
       state.transferInProgress = false;
+    },
+    // making order cases
+    // eslint-disable-next-line no-unused-vars
+    newOrderRequest: (state, action) => {
+      state.transaction = {
+        transactionType: "New Order",
+        isPending: true,
+        isSuccessful: false,
+        isError: false,
+      };
+    },
+    newOrderSuccess: (state, action) => {
+      state.transaction = {
+        transactionType: "New Order",
+        isPending: false,
+        isSuccessful: true,
+        isError: false,
+      };
+      state.events = [action.payload.event, ...state.events];
+
+      // Prevent duplicate orders from being added to store
+      const orderExists = state.allOrders.data.some(
+        (order) => order.id === action.payload.order.id
+      );
+
+      state.allOrders = {
+        ...state.allOrders,
+        data: orderExists
+          ? state.allOrders.data
+          : [...state.allOrders.data, action.payload.order],
+        loaded: true,
+      };
+    },
+    // eslint-disable-next-line no-unused-vars
+    newOrderFail: (state, action) => {
+      state.transaction = {
+        transactionType: "New Order",
+        isPending: false,
+        isSuccessful: false,
+        isError: true,
+      };
     },
   },
 });
@@ -66,5 +113,8 @@ export const {
   transferRequest,
   transferSuccess,
   transferFail,
+  newOrderRequest,
+  newOrderSuccess,
+  newOrderFail,
 } = exchangeSlice.actions;
 export default exchangeSlice.reducer;

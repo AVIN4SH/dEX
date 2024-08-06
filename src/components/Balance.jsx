@@ -50,6 +50,7 @@ const Balance = () => {
     - Step 4: Notify app that transfer was successfull
     - Step 5: Handle transfer fails - notify app
 */
+
   const depositHandler = (e, token) => {
     e.preventDefault();
     if (token.address === tokens[0].address) {
@@ -107,7 +108,7 @@ const Balance = () => {
   }, [transferInProgress]);
 
   const depositRef = useRef(null);
-  const withdrawtRef = useRef(null);
+  const withdrawRef = useRef(null);
 
   const tabHandler = (e) => {
     if (e.target.className !== depositRef.current.className) {
@@ -116,7 +117,7 @@ const Balance = () => {
       setIsDeposit(false);
     } else {
       e.target.className = "tab tab--active";
-      withdrawtRef.current.className = "tab";
+      withdrawRef.current.className = "tab";
       setIsDeposit(true);
     }
   };
@@ -133,7 +134,7 @@ const Balance = () => {
           >
             Deposit
           </button>
-          <button onClick={tabHandler} ref={withdrawtRef} className="tab">
+          <button onClick={tabHandler} ref={withdrawRef} className="tab">
             Withdraw
           </button>
         </div>

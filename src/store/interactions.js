@@ -18,6 +18,9 @@ import {
   transferRequest,
   transferSuccess,
   transferFail,
+  newOrderRequest,
+  newOrderSuccess,
+  newOrderFail,
 } from "./exchangeSlice";
 import TOKEN_ABI from "../abis/Token.json";
 import EXCHANGE_ABI from "../abis/Exchange.json";
@@ -101,6 +104,23 @@ export const subscribeToEvents = async (exchange, dispatch) => {
     // Notify app that transfer (withdraw) was successful
     dispatch(transferSuccess({ event }));
   });
+
+  exchange.on(
+    "Order",
+    (
+      id,
+      user,
+      tokenGet,
+      amountGet,
+      tokenGive,
+      amountGive,
+      timestamp,
+      event
+    ) => {
+      const order = event.args;
+      dispatch(newOrderSuccess({ order, event }));
+    }
+  );
 };
 
 // Load User Balances (Wallet & Exchange Balances)
@@ -164,5 +184,60 @@ export const transferTokens = async (
     }
   } catch (error) {
     dispatch(transferFail());
+  }
+};
+
+// Orders (Buy & Sell)
+export const makeBuyOrder = async (
+  provider,
+  exchange,
+  tokens,
+  order,
+  dispatch
+) => {
+  const tokenGet = tokens[0].address;
+  const amountGet = ethers.utils.parseUnits(order.amount, 18);
+  const tokenGive = tokens[1].address;
+  const amountGive = ethers.utils.parseUnits(
+    (order.amount * order.price).toString(),
+    18
+  ); // amount give = order's amount  x order's price
+
+  dispatch(newOrderRequest());
+  try {
+    const signer = await provider.getSigner();
+    const transaction = await exchange
+      .connect(signer)
+      .makeOrder(tokenGet, amountGet, tokenGive, amountGive);
+    await transaction.wait();
+  } catch (error) {
+    dispatch(newOrderFail());
+  }
+};
+// below we will reverse all that was in buy as now sell
+export const makeSellOrder = async (
+  provider,
+  exchange,
+  tokens,
+  order,
+  dispatch
+) => {
+  const tokenGet = tokens[1].address;
+  const amountGet = ethers.utils.parseUnits(
+    (order.amount * order.price).toString(),
+    18
+  );
+  const tokenGive = tokens[0].address;
+  const amountGive = ethers.utils.parseUnits(order.amount, 18); // amount give = order's amount  x order's price
+
+  dispatch(newOrderRequest());
+  try {
+    const signer = await provider.getSigner();
+    const transaction = await exchange
+      .connect(signer)
+      .makeOrder(tokenGet, amountGet, tokenGive, amountGive);
+    await transaction.wait();
+  } catch (error) {
+    dispatch(newOrderFail());
   }
 };

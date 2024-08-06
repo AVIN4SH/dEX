@@ -26,6 +26,8 @@ const store = configureStore({
           "exchange/exchangeLoaded",
           "exchange/transferSuccess",
           "exchange/transferFail",
+          "exchange/newOrderSuccess",
+          "exchange/newOrderFail",
         ],
         ignoredPaths: [
           "provider.connection",
@@ -34,6 +36,7 @@ const store = configureStore({
           "tokens.contracts",
           "exchange.contract",
           "exchange.events",
+          "exchange.allOrders.data",
         ],
       },
     }).concat(thunk),

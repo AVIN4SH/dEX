@@ -1,7 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap");
 
 :root {
+  /* --clr-primary: #212121; */
   --clr-primary: #0d121d;
+  /* --clr-secondary: #181818; */
   --clr-secondary: #121a29;
   --clr-neutral: #767f92;
 

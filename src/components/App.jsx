@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   loadProvider,
   loadNetwork,
@@ -12,10 +12,10 @@ import config from "../../utils/addressConfig.json";
 import Navbar from "./Navbar";
 import Markets from "./Markets";
 import Balance from "./Balance";
+import Order from "./Order";
 
 function App() {
   const dispatch = useDispatch();
-
 
   const loadBlockChainData = async () => {
     try {
@@ -39,7 +39,11 @@ function App() {
       await loadTokens(provider, [BRF.address, mETH.address], dispatch);
       // loading exchange smart contract
       const exchangeConfig = config[chainId].exchange;
-      const exchange = await loadExchange(provider, exchangeConfig.address, dispatch);
+      const exchange = await loadExchange(
+        provider,
+        exchangeConfig.address,
+        dispatch
+      );
       // Listen to events
       await subscribeToEvents(exchange, dispatch);
     } catch (error) {
@@ -58,7 +62,7 @@ function App() {
         <section className="exchange__section--left grid">
           <Markets />
           <Balance />
-          {/* Order */}
+          <Order />
         </section>
         <section className="exchange__section--right grid">
           {/* PriceChart */}
