@@ -11,9 +11,6 @@ const store = configureStore({
     exchange: exchangeReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    /*
-      To remove warning that appears because Redux Toolkit includes checks to ensure that all actions and state are serializable by default. Web3Provider objects from ethers.js are not serializable, and that's why this warning occurs.
-      */
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [
@@ -28,6 +25,9 @@ const store = configureStore({
           "exchange/transferFail",
           "exchange/newOrderSuccess",
           "exchange/newOrderFail",
+          "exchange/allOrdersLoaded",
+          "exchange/cancelledOrdersLoaded",
+          "exchange/filledOrdersLoaded",
         ],
         ignoredPaths: [
           "provider.connection",
@@ -37,6 +37,8 @@ const store = configureStore({
           "exchange.contract",
           "exchange.events",
           "exchange.allOrders.data",
+          "exchange.cancelledOrders.data",
+          "exchange.filledOrders.data",
         ],
       },
     }).concat(thunk),

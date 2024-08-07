@@ -7,12 +7,14 @@ import {
   loadExchange,
   loadAccount,
   subscribeToEvents,
+  loadAllOrders,
 } from "../store/interactions";
 import config from "../../utils/addressConfig.json";
 import Navbar from "./Navbar";
 import Markets from "./Markets";
 import Balance from "./Balance";
 import Order from "./Order";
+import OrderBook from "./OrderBook";
 
 function App() {
   const dispatch = useDispatch();
@@ -44,6 +46,8 @@ function App() {
         exchangeConfig.address,
         dispatch
       );
+      // fetch all orderS (open, filled, cancelled):
+      await loadAllOrders(provider, exchange, dispatch);
       // Listen to events
       await subscribeToEvents(exchange, dispatch);
     } catch (error) {
@@ -68,7 +72,7 @@ function App() {
           {/* PriceChart */}
           {/* Transactions */}
           {/* Trades */}
-          {/* OrderBook */}
+          <OrderBook />
         </section>
       </main>
       {/* Alert */}

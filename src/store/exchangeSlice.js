@@ -18,11 +18,38 @@ const exchangeSlice = createSlice({
       loaded: false,
       data: [],
     },
+    cancelledOrders: {
+      loaded: false,
+      data: [],
+    },
+    filledOrders: {
+      loaded: false,
+      data: [],
+    },
   },
   reducers: {
     exchangeLoaded: (state, action) => {
       state.loaded = true;
       state.contract = action.payload.exchange;
+    },
+    // orders loaded: (cancelled, filled & all)
+    allOrdersLoaded: (state, action) => {
+      state.allOrders = {
+        loaded: true,
+        data: action.payload.allOrders,
+      };
+    },
+    cancelledOrdersLoaded: (state, action) => {
+      state.cancelledOrders = {
+        loaded: true,
+        data: action.payload.cancelledOrders,
+      };
+    },
+    filledOrdersLoaded: (state, action) => {
+      state.filledOrders = {
+        loaded: true,
+        data: action.payload.filledOrders,
+      };
     },
     exchnageToken1BalanceLoaded: (state, action) => {
       state.balances[0] = action.payload.balance;
@@ -83,7 +110,7 @@ const exchangeSlice = createSlice({
 
       // Prevent duplicate orders from being added to store
       const orderExists = state.allOrders.data.some(
-        (order) => order.id === action.payload.order.id
+        (order) => order.id.toString() === action.payload.order.id.toString()
       );
 
       state.allOrders = {
@@ -116,5 +143,8 @@ export const {
   newOrderRequest,
   newOrderSuccess,
   newOrderFail,
+  allOrdersLoaded,
+  cancelledOrdersLoaded,
+  filledOrdersLoaded,
 } = exchangeSlice.actions;
 export default exchangeSlice.reducer;

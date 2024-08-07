@@ -21,6 +21,9 @@ import {
   newOrderRequest,
   newOrderSuccess,
   newOrderFail,
+  allOrdersLoaded,
+  cancelledOrdersLoaded,
+  filledOrdersLoaded,
 } from "./exchangeSlice";
 import TOKEN_ABI from "../abis/Token.json";
 import EXCHANGE_ABI from "../abis/Exchange.json";
@@ -148,6 +151,26 @@ export const loadBalances = async (exchange, tokens, account, dispatch) => {
   } catch (error) {
     console.error("Failed to load Balances:", error);
   }
+};
+
+// Load all orders (cancelled, filled & all)
+export const loadAllOrders = async (provider, exchange, dispatch) => {
+  const block = await provider.getBlockNumber();
+
+  // Fetch all cancelled orders:
+  const cancelStream = await exchange.queryFilter("Cancel", 0, block);
+  const cancelledOrders = cancelStream.map((event) => event.args);
+  dispatch(cancelledOrdersLoaded({ cancelledOrders }));
+
+  // Fetch filled orders:
+  const tradeStream = await exchange.queryFilter("Trade", 0, block);
+  const filledOrders = tradeStream.map((event) => event.args);
+  dispatch(filledOrdersLoaded({ filledOrders }));
+
+  // Fetch all orders:
+  const orderStream = await exchange.queryFilter("Order", 0, block);
+  const allOrders = orderStream.map((event) => event.args);
+  dispatch(allOrdersLoaded({ allOrders }));
 };
 
 // Transfer Tokens (Deposit & Withdraw)
