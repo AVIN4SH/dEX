@@ -305,24 +305,15 @@ select:hover {
 /* ------------------------------------------------------ */
 /* CHART COMPONENT */
 
-.exchange__chart {
+.exchange__metamaskBanner {
   background: var(--clr-secondary);
 
   padding: 0.75em 1.75em;
   margin: 0.75em;
-  min-height: 325px;
+  min-height: 100px;
 
   grid-column-start: 1;
   grid-column-end: 13;
-}
-
-.apexcharts-canvas {
-  margin: 0 auto;
-}
-
-.apexcharts-tooltip {
-  background: var(--clr-primary);
-  color: var(--clr-white);
 }
 
 /* ------------------------------------------------------ */

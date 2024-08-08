@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   loadProvider,
   loadNetwork,
@@ -15,9 +15,12 @@ import Markets from "./Markets";
 import Balance from "./Balance";
 import Order from "./Order";
 import OrderBook from "./OrderBook";
+import Banner from "./Banner";
 
 function App() {
   const dispatch = useDispatch();
+
+  const account = useSelector((state) => state.provider.account);
 
   const loadBlockChainData = async () => {
     try {
@@ -69,7 +72,11 @@ function App() {
           <Order />
         </section>
         <section className="exchange__section--right grid">
-          {/* PriceChart */}
+          {!account && (
+            <div className="component exchange__metamaskBanner">
+              <Banner text={"Please connect with Metamask"} />
+            </div>
+          )}
           {/* Transactions */}
           {/* Trades */}
           <OrderBook />

@@ -52,7 +52,7 @@ const Navbar = () => {
             <option value="" disabled>
               Select Network
             </option>
-            <option value="0x7A69">Localhost</option>
+            <option value="0x7A69">Localhost (Hardhat)</option>
             {/* <option value="0x2a">Kovan</option> */}
             {/* Test network link not connecting and error 4902 occuring when this is selected */}
           </select>
