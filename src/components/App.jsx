@@ -16,6 +16,7 @@ import Balance from "./Balance";
 import Order from "./Order";
 import OrderBook from "./OrderBook";
 import Banner from "./Banner";
+import Trades from "./Trades";
 
 function App() {
   const dispatch = useDispatch();
@@ -78,7 +79,7 @@ function App() {
             </div>
           )}
           {/* Transactions */}
-          {/* Trades */}
+          <Trades />
           <OrderBook />
         </section>
       </main>

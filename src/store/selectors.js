@@ -81,6 +81,76 @@ const decorateOrderBookOrders = (orders, tokens) => {
   });
 };
 
+// below method is to decorate filled orders (to be shown in trade section)
+const decorateFilledOrders = (orders, tokens) => {
+  // tracking previous order to compare history
+  let previousOrder = orders[0]; // we update inside map and 1st time previous will be [0] index
+
+  return orders.map((order) => {
+    // decorate each individual order
+    order = decorateOrder(order, tokens); //this adds price so that we can compare to previous and add color accordingly
+    order = decorateFilledOrder(order, previousOrder);
+    previousOrder = order; //updating previousOrder once its decorated
+    return order;
+  });
+};
+
+// below method will be using inside above wrapper function and will decorate each filled order:
+const decorateFilledOrder = (order, previousOrder) => {
+  return {
+    ...order,
+    tokenPriceClass: tokenPriceClass(order.tokenPrice, order.id, previousOrder),
+    // tokenPriceClass: order.tokenPrice >= previousOrder.tokenPrice ? GREEN : RED,
+  };
+};
+
+const tokenPriceClass = (tokenPrice, orderId, previousOrder) => {
+  // showing green price if only one order exists
+  if (previousOrder.id === orderId) {
+    return GREEN;
+  }
+  // showing green price if order price is higher than previous order
+  // show red price if order price lower than previous order
+  if (previousOrder.tokenPrice <= tokenPrice) {
+    return GREEN; // success
+  } else {
+    return RED; // danger
+  }
+};
+
+// --------------------------------------------------
+// Calculate all filled orders (for trades section)
+export const filledOrdersSeclector = createSelector(
+  filledOrders,
+  tokens,
+  (orders, tokens) => {
+    if (!tokens[0] || !tokens[1]) {
+      return; // this is for when no tokens, so we return from function
+    }
+    // * - Filter orders by selected tokens:
+    orders = orders.filter(
+      (o) =>
+        (o.tokenGet === tokens[0].address ||
+          o.tokenGet === tokens[1].address) &&
+        (o.tokenGive === tokens[0].address || o.tokenGive === tokens[1].address)
+    );
+
+    // Step 1: sort orders by ascending time
+    // Step 2: apply order colors(decorate)
+    // Step 3: sort orders by descending time for UI
+
+    // Step 1: sort orders by time ascending for price comparision
+    orders = orders.sort((a, b) => a.timestamp - b.timestamp);
+    // Step 2: apply order colors(decorate)
+    orders = decorateFilledOrders(orders, tokens);
+    // Step 3: sort orders by date descending time for UI
+    orders = orders.sort((a, b) => b.timestamp - a.timestamp);
+    // console.log(orders);
+    return orders;
+  }
+);
+
+// --------------------------------------------------
 // Selector to get data for orderbook
 export const orderBookSelector = createSelector(
   openOrders,
