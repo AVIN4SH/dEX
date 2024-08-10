@@ -200,6 +200,67 @@ export const filledOrdersSeclector = createSelector(
 );
 
 // --------------------------------------------------
+// Selector for my filled orders
+export const myFilledOrdersSelector = createSelector(
+  account,
+  tokens,
+  filledOrders,
+  (account, tokens, orders) => {
+    if (!tokens[0] || !tokens[1]) {
+      return;
+    } else {
+      // Find Our Orders
+      orders = orders.filter(
+        (o) => o.user === account || o.creator === account
+      );
+      // Filter orders by selected tokens pair:
+      orders = orders.filter(
+        (o) =>
+          (o.tokenGet === tokens[0].address ||
+            o.tokenGet === tokens[1].address) &&
+          (o.tokenGive === tokens[0].address ||
+            o.tokenGive === tokens[1].address)
+      );
+      // Sort orders by date descending: (to display latest on top)
+      orders = orders.sort((a, b) => b.timestamp - a.timestamp);
+      // decorate orders: add display attributes
+      orders = decorateMyFilledOrders(orders, account, tokens);
+      // console.log(orders);
+      return orders;
+    }
+  }
+);
+
+// below is for decorating myFiledOrder:
+const decorateMyFilledOrders = (orders, account, tokens) => {
+  return orders.map((order) => {
+    order = decorateOrder(order, tokens); // add general attributes like token amounts, formatted time, etc.
+    order = decorateMyFilledOrder(order, account, tokens); // decorate myFilledorders one by one
+    return order;
+  });
+};
+
+// below is to decorate each individual order in myFiledOrder: (this is used in above wrapper)
+const decorateMyFilledOrder = (order, account, tokens) => {
+  const myOrder = order.creator === account;
+  let orderType;
+  if (myOrder) {
+    // if my order & token give is token 2 then it is buy order
+    orderType = order.tokenGive === tokens[1].address ? "buy" : "sell";
+  } else {
+    // if its not my order & token give is token 2 then it is sell order
+    orderType = order.tokenGive === tokens[1].address ? "sell" : "buy";
+  }
+
+  return {
+    ...order,
+    orderType,
+    orderClass: orderType === "buy" ? GREEN : RED, // we make green when buy & red when sell order
+    orderSign: orderType === "buy" ? "+" : "-", // sign is plus when buy & minus when sell order
+  };
+};
+
+// --------------------------------------------------
 // Selector to get data for orderbook
 export const orderBookSelector = createSelector(
   openOrders,
