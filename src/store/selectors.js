@@ -8,6 +8,7 @@ const GREEN = "#25CE8F";
 const RED = "#F45353";
 
 const tokens = (state) => get(state, "tokens.contracts");
+const account = (state) => get(state, "provider.account");
 const allOrders = (state) => get(state, "exchange.allOrders.data", []);
 const cancelledOrders = (state) =>
   get(state, "exchange.cancelledOrders.data", []);
@@ -30,6 +31,54 @@ const openOrders = (state) => {
     //! this rejects i.e; removes filled & canclled orders so that we only show open orders in book
   });
   return openOrders;
+};
+
+// Below selector is for getting my open orders to display the users orders only in ui
+export const myOpenOrdersSelector = createSelector(
+  account,
+  tokens,
+  openOrders,
+  (account, tokens, orders) => {
+    if (!tokens[0] || !tokens[1]) {
+      return;
+    } else {
+      // Filter orders created by current account:
+      orders = orders.filter((o) => o.user === account);
+      // Filter orders by token address:
+      orders = orders.filter(
+        (o) =>
+          (o.tokenGet === tokens[0].address ||
+            o.tokenGet === tokens[1].address) &&
+          (o.tokenGive === tokens[0].address ||
+            o.tokenGive === tokens[1].address)
+      );
+      // decorating myOpenOrders: (adding dispay attributes)
+      orders = decorateMyOpenOrders(orders, tokens);
+      // Sort orders by date descending (so that we see latest on top)
+      orders = orders.sort((a, b) => b.timestamp - a.timestamp);
+      // console.log(orders);
+      return orders;
+    }
+  }
+);
+
+// below is for decorating myOpenOrder:
+const decorateMyOpenOrders = (orders, tokens) => {
+  return orders.map((order) => {
+    order = decorateOrder(order, tokens); // this is basic decorator that adds token amounts, formatted time stamp, etc
+    order = decorateMyOpenOrder(order, tokens); // this is custom decorator for myOpenOrder only
+    return order;
+  });
+};
+
+// below is to decorate each individual order in myOpenOrder: (this is used in above wrapper)
+const decorateMyOpenOrder = (order, tokens) => {
+  let orderType = order.tokenGive === tokens[1].address ? "buy" : "sell";
+  return {
+    ...order,
+    orderType,
+    orderTypeClass: orderType === "buy" ? GREEN : RED, // adding green to buy orders & red to sell orders
+  };
 };
 
 // below method is to add certain key value pairs to each order that will help us display order informatiuon in good format

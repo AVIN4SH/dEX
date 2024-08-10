@@ -17,6 +17,7 @@ import Order from "./Order";
 import OrderBook from "./OrderBook";
 import Banner from "./Banner";
 import Trades from "./Trades";
+import Transactions from "./Transactions";
 
 function App() {
   const dispatch = useDispatch();
@@ -78,7 +79,7 @@ function App() {
               <Banner text={"Please connect with Metamask"} />
             </div>
           )}
-          {/* Transactions */}
+          <Transactions />
           <Trades />
           <OrderBook />
         </section>
