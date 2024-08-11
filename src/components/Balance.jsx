@@ -30,7 +30,7 @@ const Balance = () => {
     if (exchange && tokens[0] && tokens[1] && account) {
       loadBalances(exchange, tokens, account, dispatch);
     }
-  }, [exchange, tokens, account]); // we reload method also when value of transferInProgress changes
+  }, [exchange, tokens, account, dispatch]); // we reload method also when value of transferInProgress changes
 
   const amountHandler = (e, token) => {
     if (token.address === tokens[0].address) {

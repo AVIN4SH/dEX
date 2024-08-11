@@ -13,6 +13,17 @@ const allOrders = (state) => get(state, "exchange.allOrders.data", []);
 const cancelledOrders = (state) =>
   get(state, "exchange.cancelledOrders.data", []);
 const filledOrders = (state) => get(state, "exchange.filledOrders.data", []);
+const events = (state) => get(state, "exchange.events");
+
+// selector for selecting my events (here we select only the events we are concerned with)
+export const myEventsSelector = createSelector(
+  account,
+  events,
+  (account, events) => {
+    events = events.filter((e) => e.args.user === account);
+    return events;
+  }
+);
 
 // getting open orders from store to display in book:
 const openOrders = (state) => {
