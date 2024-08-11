@@ -27,6 +27,9 @@ import {
   orderCancelRequest,
   orderCancelSuccess,
   orderCancelFail,
+  orderFillRequest,
+  orderFillSuccess,
+  orderFillFail,
 } from "./exchangeSlice";
 import TOKEN_ABI from "../abis/Token.json";
 import EXCHANGE_ABI from "../abis/Exchange.json";
@@ -140,9 +143,28 @@ export const subscribeToEvents = async (exchange, dispatch) => {
       timestamp,
       event
     ) => {
-      // Notify app that cancel (withdraw) was successful
+      // Notify app that cancel was successful
       const order = event.args;
       dispatch(orderCancelSuccess({ order, event }));
+    }
+  );
+
+  exchange.on(
+    "Trade",
+    (
+      id,
+      user,
+      tokenGet,
+      amountGet,
+      tokenGive,
+      amountGive,
+      creator,
+      timestamp,
+      event
+    ) => {
+      // Notify app that Filling was successful
+      const order = event.args;
+      dispatch(orderFillSuccess({ order, event }));
     }
   );
 };
@@ -295,5 +317,17 @@ export const cancelOrder = async (provider, exchange, order, dispatch) => {
     await transaction.wait();
   } catch (error) {
     dispatch(orderCancelFail());
+  }
+};
+
+// Fill Orders:
+export const fillOrder = async (provider, exchange, order, dispatch) => {
+  dispatch(orderFillRequest());
+  try {
+    const signer = await provider.getSigner();
+    const transaction = await exchange.connect(signer).fillOrder(order.id);
+    await transaction.wait();
+  } catch (error) {
+    dispatch(orderFillFail());
   }
 };

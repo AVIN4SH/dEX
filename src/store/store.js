@@ -31,6 +31,7 @@ const store = configureStore({
           "exchange/orderCancelRequest",
           "exchange/orderCancelSuccess",
           "exchange/orderCancelFail",
+          "exchange/orderFillSuccess",
         ],
         ignoredPaths: [
           "provider.connection",

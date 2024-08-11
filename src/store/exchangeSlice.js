@@ -32,7 +32,8 @@ const exchangeSlice = createSlice({
       state.loaded = true;
       state.contract = action.payload.exchange;
     },
-    // orders loaded: (cancelled, filled & all)
+    // ------------------------------------------------------------------------------
+    // orders loaded: (cancelled, filled & all) -----------------------------------------------
     allOrdersLoaded: (state, action) => {
       state.allOrders = {
         loaded: true,
@@ -57,6 +58,7 @@ const exchangeSlice = createSlice({
     exchnageToken2BalanceLoaded: (state, action) => {
       state.balances[1] = action.payload.balance;
     },
+    // ------------------------------------------------------------------------------
     // tracking transfer cases (deposit & withdraw)
     // eslint-disable-next-line no-unused-vars
     transferRequest: (state, action) => {
@@ -89,7 +91,8 @@ const exchangeSlice = createSlice({
       };
       state.transferInProgress = false;
     },
-    // making order cases
+    // ------------------------------------------------------------------------------
+    // making order cases:
     // eslint-disable-next-line no-unused-vars
     newOrderRequest: (state, action) => {
       state.transaction = {
@@ -130,6 +133,7 @@ const exchangeSlice = createSlice({
         isError: true,
       };
     },
+    // ------------------------------------------------------------------------------
     // cancel order cases:
     // eslint-disable-next-line no-unused-vars
     orderCancelRequest: (state, action) => {
@@ -159,6 +163,47 @@ const exchangeSlice = createSlice({
         isError: true,
       };
     },
+    // ------------------------------------------------------------------------------
+    // filling order cases: (trading)
+    // eslint-disable-next-line no-unused-vars
+    orderFillRequest: (state, action) => {
+      state.transaction = {
+        transactionType: "Fill Order",
+        isPending: true,
+        isSuccessful: false,
+        isError: false,
+      };
+    },
+    orderFillSuccess: (state, action) => {
+      state.transaction = {
+        transactionType: "Fill Order",
+        isPending: false,
+        isSuccessful: true,
+        isError: false,
+      };
+      // Prevent duplicate orders from being added to store
+      const orderExists = state.filledOrders.data.some(
+        (order) => order.id.toString() === action.payload.order.id.toString()
+      );
+      state.filledOrders = {
+        ...state.filledOrders,
+        data: orderExists
+          ? state.filledOrders.data
+          : [...state.filledOrders.data, action.payload.order],
+        loaded: true,
+      };
+      state.events = [action.payload.event, ...state.events];
+    },
+    // eslint-disable-next-line no-unused-vars
+    orderFillFail: (state, action) => {
+      state.transaction = {
+        transactionType: "Fill Order",
+        isPending: false,
+        isSuccessful: false,
+        isError: true,
+      };
+    },
+    // ------------------------------------------------------------------------------
   },
 });
 
@@ -178,5 +223,8 @@ export const {
   orderCancelRequest,
   orderCancelSuccess,
   orderCancelFail,
+  orderFillRequest,
+  orderFillSuccess,
+  orderFillFail,
 } = exchangeSlice.actions;
 export default exchangeSlice.reducer;
