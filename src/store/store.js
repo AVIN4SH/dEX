@@ -28,6 +28,9 @@ const store = configureStore({
           "exchange/allOrdersLoaded",
           "exchange/cancelledOrdersLoaded",
           "exchange/filledOrdersLoaded",
+          "exchange/orderCancelRequest",
+          "exchange/orderCancelSuccess",
+          "exchange/orderCancelFail",
         ],
         ignoredPaths: [
           "provider.connection",

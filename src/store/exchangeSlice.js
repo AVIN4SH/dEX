@@ -130,6 +130,35 @@ const exchangeSlice = createSlice({
         isError: true,
       };
     },
+    // cancel order cases:
+    // eslint-disable-next-line no-unused-vars
+    orderCancelRequest: (state, action) => {
+      state.transaction = {
+        transactionType: "Cancel Order",
+        isPending: true,
+        isSuccessful: false,
+        isError: false,
+      };
+    },
+    orderCancelSuccess: (state, action) => {
+      state.transaction = {
+        transactionType: "Cancel Order",
+        isPending: false,
+        isSuccessful: true,
+        isError: false,
+      };
+      state.events = [action.payload.event, ...state.events];
+      state.cancelledOrders.data.push(action.payload.order);
+    },
+    // eslint-disable-next-line no-unused-vars
+    orderCancelFail: (state, action) => {
+      state.transaction = {
+        transactionType: "Cancel Order",
+        isPending: false,
+        isSuccessful: false,
+        isError: true,
+      };
+    },
   },
 });
 
@@ -146,5 +175,8 @@ export const {
   allOrdersLoaded,
   cancelledOrdersLoaded,
   filledOrdersLoaded,
+  orderCancelRequest,
+  orderCancelSuccess,
+  orderCancelFail,
 } = exchangeSlice.actions;
 export default exchangeSlice.reducer;
