@@ -97,13 +97,7 @@ const Alert = () => {
               events[0].transactionHash.slice(60, 66)}
           </a>
         </div>
-      ) : (
-        <div
-          ref={alertRef}
-          onClick={removeHandler}
-          className="alert alert--remove"
-        ></div>
-      )}
+      ) : null}
     </div>
   );
 };

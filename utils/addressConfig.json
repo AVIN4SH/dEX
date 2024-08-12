@@ -15,6 +15,18 @@
     "explorerURL": "#"
   },
   "42": {
+    "exchange": {
+      "address": ""
+    },
+    "BRF": {
+      "address": ""
+    },
+    "mETH": {
+      "address": ""
+    },
+    "mDAI": {
+      "address": ""
+    },
     "explorerURL": "https://kovan.etherscan.io/"
   }
 }

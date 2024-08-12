@@ -1,10 +1,3 @@
-<!--
- removed kovvan option from select network tab as project id need to be taken by creating account on kovan.infura
-            {/* <option value="0x2a">Kovan</option> */}
-            {/* Test network link not connecting and error 4902 occuring when this is selected */}
-
--->
-
 # To start the project follow these commands:
 
 First Command:
@@ -31,12 +24,14 @@ Fourth Command:
 npm run dev
 ```
 
+# Follow above commands to see project in action
+
 Following above steps will start the project
 
 In case of any unexpected behaviour occurance, check the address of tokens and exchange from 2nd commands output match the ones in utils/addressConfig.json.
 They should be same for the deploy to work correctly when using hardhat as network
 
-# To run scripts of deployment follow these steps:
+# To run scripts only of deployment follow these steps:
 
 First Command:
 
@@ -56,7 +51,7 @@ Third Command:
 npx hardhat run --network localhost scripts/2_seed-exchange.js
 ```
 
-# To run tests follow these steps:
+# To run tests only follow these steps:
 
 To run all tests together:
 
