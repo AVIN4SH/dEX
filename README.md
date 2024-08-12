@@ -1,16 +1,20 @@
 # Project Information
 
-<h3>This is a dEX (Decentralized Exchange) Platform for trading in a custom ERC-20 complient token</h3>
-<h3>This token is named BRF which can be traded with 2 mock tokens when are also created using the ERC-20 complient token which is created using Token contract. These mock tokens are: mETH & mDAI</h3>
-<h3>This Project is created using:</h3>
+<h4>This is a dEX (Decentralized Exchange) Platform for trading in a custom ERC-20 complient token</h4>
+<h4>This token is named BRF which can be traded with 2 mock tokens when are also created using the ERC-20 complient token which is created using Token contract. These mock tokens are: mETH & mDAI</h4>
+<h4>This Project is created using:</h4>
 <p>
-    <em>Frontend: React JS (Built using VITE)</em> <br/>
-    <em>Blockchain: Solidity (for smart contracts), Hardhat, Ethersjs</em> <br/>
+    <em><strong>Frontend:</strong> React JS (Built using VITE)</em> <br/>
+    <em><strong>Blockchain:</strong> Solidity (for smart contracts), Hardhat, Ethersjs</em> <br/>
 </p>
 
 ---
 
 # To start the project follow these commands:
+Note: Following above steps will start the project
+- Add Hardhat account 0 and Hardhat account 1 to your Metamask using the private key generated on execution of  ```npx hardhat node```
+- In case of any unexpected behaviour occurance, check the address of tokens and exchange from 2nd commands output match the ones in utils/addressConfig.json.
+They should be same for the deploy to work correctly when using hardhat as network
 
 First Command: (To execute hardhat node)
 
@@ -37,11 +41,6 @@ npm run dev
 ```
 
 # Follow above commands to see project in action
-
-Note: Following above steps will start the project
-
-In case of any unexpected behaviour occurance, check the address of tokens and exchange from 2nd commands output match the ones in utils/addressConfig.json.
-They should be same for the deploy to work correctly when using hardhat as network
 
 ---
 
