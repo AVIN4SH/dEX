@@ -1,24 +1,36 @@
+# Project Information
+
+<h3>This is a dEX (Decentralized Exchange) Platform for trading in a custom ERC-20 complient token</h3>
+<h3>This token is named BRF which can be traded with 2 mock tokens when are also created using the ERC-20 complient token which is created using Token contract. These mock tokens are: mETH & mDAI</h3>
+<h3>This Project is created using:</h3>
+<p>
+    <em>Frontend: React JS (Built using VITE)</em> <br/>
+    <em>Blockchain: Solidity (for smart contracts), Hardhat, Ethersjs</em> <br/>
+</p>
+
+---
+
 # To start the project follow these commands:
 
-First Command:
+First Command: (To execute hardhat node)
 
 ```
 npx hardhat node
 ```
 
-Second Command:
+Second Command: (To run Deploy script)
 
 ```
 npx hardhat run --network localhost scripts/1_deploy.js
 ```
 
-Third Command:
+Third Command: (To run seeding script so that we have filled Order Book at start)
 
 ```
 npx hardhat run --network localhost scripts/2_seed-exchange.js
 ```
 
-Fourth Command:
+Fourth Command: (To run local server to view the dEX platform)
 
 ```
 npm run dev
