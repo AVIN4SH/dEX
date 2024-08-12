@@ -4,8 +4,10 @@
 <h4>This token is named BRF which can be traded with 2 mock tokens when are also created using the ERC-20 complient token which is created using Token contract. These mock tokens are: mETH & mDAI</h4>
 <h4>This Project is created using:</h4>
 <p>
-    <em><strong>Frontend:</strong> React JS (Built using VITE)</em> <br/>
-    <em><strong>Blockchain:</strong> Solidity (for smart contracts), Hardhat, Ethersjs</em> <br/>
+    <span>-<em><a href="https://react.dev/" target="_blank" >React JS</a> (for Frontend)</em></span><br/>
+    <span>-<em><a href="https://soliditylang.org/" target="_blank" >Solidity</a> (for Smart Contracts)</em></span><br/>
+    <span>-<em><a href="https://docs.ethers.org/v5/" target="_blank" >Etherjs</a> (for Blockchain Interaction)</em></span><br/>
+    <span>-<em><a href="https://hardhat.org/" target="_blank" >Hardhat</a> (Ethereum Development Environment)</em></span><br/>
 </p>
 
 ---
